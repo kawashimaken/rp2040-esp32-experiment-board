@@ -13,7 +13,10 @@ The purpose of this board is to confirm or practice the following things:
 * test lipo battery charging chip
 * test SD card with RP2040
 
-# render (LED for RP2040 added)
+
+The PCB is desing with KiCad, manufactured by JLCPCB.
+
+# Kicad render (LED for RP2040 added)
 
 ![photo](./pics/rp2040_esp32_render.jpg)
 
@@ -22,6 +25,5 @@ The purpose of this board is to confirm or practice the following things:
 ![rp2040-esp32-experiment-board schematic](./hardware/schematic.svg)
 
 # the first version
-
 
 ![photo](./pics/rp2040_esp32.jpeg)
