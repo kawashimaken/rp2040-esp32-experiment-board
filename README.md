@@ -1,7 +1,7 @@
 # Watch the video
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=p60-jE2-4uw" target="_blank">
- <img src="http://img.youtube.com/vi/p60-jE2-4uw/hqdefault.jpg" alt="Watch the video" width="640" height="360" border="10" />
+ <img src="http://img.youtube.com/vi/p60-jE2-4uw/hqdefault.jpg" alt="Watch the video" width="640" height="360" border="0" />
 </a>
 
 
