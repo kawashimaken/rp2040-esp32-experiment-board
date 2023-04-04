@@ -1,3 +1,7 @@
+# Watch the video
+
+[![Watch the video](https://img.youtube.com/vi/p60-jE2-4uw/default.jpg)](https://youtu.be/p60-jE2-4uw)
+
 # license
 
 * will be updated soon. (feel free to tinker for you personal use)
