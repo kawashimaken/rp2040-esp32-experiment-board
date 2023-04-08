@@ -19,7 +19,7 @@ The purpose of this board is to confirm or practice the following things:
 * test SD card with RP2040
 
 
-The PCB is desing with KiCad, manufactured by JLCPCB.
+The PCB is designed with KiCad, manufactured by JLCPCB.
 
 # KiCad render (LED for RP2040 added, GP25)
 
