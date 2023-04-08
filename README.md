@@ -21,7 +21,7 @@ The purpose of this board is to confirm or practice the following things:
 
 The PCB is desing with KiCad, manufactured by JLCPCB.
 
-# Kicad render (LED for RP2040 added)
+# KiCad render (LED for RP2040 added, GP25)
 
 ![photo](./pics/rp2040_esp32_render.jpg)
 
