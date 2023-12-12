@@ -87,13 +87,13 @@ void loop() {
         mydrawtext('4', ST77XX_WHITE);
       }
       char old_text = text;
-      delay(10);
+      delay(1);
     }
   } else {
     mydrawtext(' ', ST77XX_WHITE);
     digitalWrite(LED, LOW);
   }
-  delay(100);
+  delay(10);
 }
 
 void testlines(uint16_t color) {
