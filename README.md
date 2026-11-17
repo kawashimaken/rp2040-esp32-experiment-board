@@ -1,6 +1,12 @@
 # Watch the video
 
-[![](https://img.youtube.com/vi/p60-jE2-4uw/0.jpg)](https://www.youtube.com/watch?v=p60-jE2-4uw)
+<div align="center">
+  <div align="center">
+  <a href="https://youtu.be/p60-jE2-4uw" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.youtube.com/vi/p60-jE2-4uw/maxresdefault.jpg" alt="YouTube Video" width="800" />
+  </a>
+</div>
+</div>
 
 
 # license
