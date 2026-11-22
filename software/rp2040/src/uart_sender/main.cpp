@@ -1,4 +1,4 @@
-// Port of rp2040_micropython/uart_sender/main.py
+// C++ port of the original MicroPython uart_sender/main.py
 // Buttons on GP0-GP4 (falling edge) send '0'-'4' to the ESP32 (9600 8N1).
 // Debounce: 500 ms, shared by all buttons.
 //
