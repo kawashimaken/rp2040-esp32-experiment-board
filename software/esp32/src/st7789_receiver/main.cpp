@@ -1,3 +1,4 @@
+#include <Arduino.h>
 /* worked ! */
 
 #include <SPI.h>
@@ -21,6 +22,7 @@ float p = 3.1415926;
 int LED = 18;
 
 HardwareSerial SerialPort(2);  // use UART2
+const int LINK_RX_PIN = 17;  // IO17 <- RP2040 GP9
 char old_text = ' ';
 
 void setup(void) {
@@ -51,9 +53,19 @@ void setup(void) {
 
 
 
-  SerialPort.begin(9600, SERIAL_8N1, 16, 17);
+  // Workaround: on this board the GP8 -> IO16 line does not reach the ESP32,
+  // so the RP2040 transmits on GP9 instead and the ESP32 receives on IO17.
+  // TX is disabled (-1) so the ESP32 never drives IO17.
+  SerialPort.begin(9600, SERIAL_8N1, LINK_RX_PIN, -1);
   pinMode(LED, OUTPUT);
   digitalWrite(LED, LOW);
+
+  // Boot screen: confirms the display and this sketch are running
+  tft.setTextColor(ST77XX_GREEN);
+  tft.setTextSize(4);
+  tft.setCursor(30, 100);
+  tft.print(F("READY"));
+  Serial.println(F("Waiting for UART2 (RX=IO17) ..."));
 }
 
 
@@ -66,34 +78,20 @@ void mydrawtext(char text, uint16_t color) {
   tft.print(text);
 }
 void loop() {
-  
   if (SerialPort.available()) {
     char text = SerialPort.read();
-    if (old_text != text) {
-      if (text == '0') {
-        mydrawtext('0', ST77XX_WHITE);
-        digitalWrite(LED, HIGH);
-      }
-      if (text == '1') {
-        mydrawtext('1', ST77XX_WHITE);
-      }
-      if (text == '2') {
-        mydrawtext('2', ST77XX_WHITE);
-      }
-      if (text == '3') {
-        mydrawtext('3', ST77XX_WHITE);
-      }
-      if (text == '4') {
-        mydrawtext('4', ST77XX_WHITE);
-      }
-      char old_text = text;
-      delay(1);
+    Serial.print(F("RX: 0x"));
+    Serial.print((uint8_t)text, HEX);
+    Serial.print(F(" '"));
+    Serial.print(text);
+    Serial.println(F("'"));
+    if (text >= '0' && text <= '4') {
+      // Keep the last received digit on screen until a new one arrives
+      mydrawtext(text, ST77XX_YELLOW);
+      digitalWrite(LED, text == '0' ? HIGH : LOW);
+      old_text = text;
     }
-  } else {
-    mydrawtext(' ', ST77XX_WHITE);
-    digitalWrite(LED, LOW);
   }
-  delay(10);
 }
 
 void testlines(uint16_t color) {

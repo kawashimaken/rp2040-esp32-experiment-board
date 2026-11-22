@@ -1,3 +1,4 @@
+#include <Arduino.h>
 
 #include <LovyanGFX.hpp>
 
@@ -19,7 +20,7 @@ class LGFX : public lgfx::LGFX_Device {
 
 
   // 接続するパネルの型にあったインスタンスを用意します。
-  //lgfx::Panel_GC9A01      _panel_instance;
+  //lgfx::Panel_GC9A01     _panel_instance;
   //lgfx::Panel_GDEW0154M09 _panel_instance;
   //lgfx::Panel_HX8357B     _panel_instance;
   //lgfx::Panel_HX8357D     _panel_instance;
