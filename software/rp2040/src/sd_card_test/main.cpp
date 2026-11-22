@@ -4,91 +4,86 @@
 // Results are printed to USB serial (115200). Creates rats.txt and rats1.txt on the card.
 //
 // SD card (SPI mode): CLK=GP5, CMD(MOSI)=GP18, DAT0(MISO)=GP19, DAT3/CS=GP22
+// Uses SdFat's FAT code on top of BitbangSdCard (lib/BitbangSdCard), a small
+// bit-banged driver. SdFat's own drivers could not write to the card on this board.
 #include <Arduino.h>
-#include <SD.h>
-#include <SoftwareSPI.h>
+#include <BitbangSdCard.h>
+#include <SdFat.h>
 
 static const uint8_t SD_SCK = 5;
 static const uint8_t SD_MOSI = 18;
 static const uint8_t SD_MISO = 19;
 static const uint8_t SD_CS = 22;
 
-static SoftwareSPI sdSpi(SD_SCK, SD_MISO, SD_MOSI);
+static BitbangSdCard card(SD_SCK, SD_MOSI, SD_MISO, SD_CS);
+static FsVolume sd;
 
 static const char LINE[] = "abcdefghijklmnopqrstuvwxyz\n";  // 27 chars
 static const int LINE_REPEAT = 200;                         // 5400 chars
 static const char SHORT_LINE[] = "1234567890\n";
 
-static void write_lines(File &f) {
+static void write_lines(FsFile &f) {
   for (int i = 0; i < LINE_REPEAT; i++) f.print(LINE);
+}
+
+static bool read_expect(FsFile &f, const char *text) {
+  for (size_t j = 0; j < strlen(text); j++) {
+    if (f.read() != text[j]) return false;
+  }
+  return true;
 }
 
 // Checks that the file contains exactly: LINE x200, SHORT_LINE, LINE x200
 static bool verify_large(const char *path) {
-  File f = SD.open(path, FILE_READ);
+  FsFile f = sd.open(path, O_RDONLY);
   if (!f) return false;
   size_t expected = 2 * LINE_REPEAT * strlen(LINE) + strlen(SHORT_LINE);
-  Serial.printf("%u bytes read\n", (unsigned)f.size());
-  bool ok = f.size() == expected;
-  for (int part = 0; ok && part < 3; part++) {
-    int repeat = (part == 1) ? 1 : LINE_REPEAT;
-    const char *text = (part == 1) ? SHORT_LINE : LINE;
-    for (int i = 0; ok && i < repeat; i++) {
-      for (size_t j = 0; ok && j < strlen(text); j++) ok = f.read() == text[j];
-    }
-  }
+  Serial.printf("%lu bytes read\n", (unsigned long)f.fileSize());
+  bool ok = f.fileSize() == expected;
+  for (int i = 0; ok && i < LINE_REPEAT; i++) ok = read_expect(f, LINE);
+  ok = ok && read_expect(f, SHORT_LINE);
+  for (int i = 0; ok && i < LINE_REPEAT; i++) ok = read_expect(f, LINE);
   f.close();
   return ok;
 }
 
 static bool verify_small(const char *path) {
-  File f = SD.open(path, FILE_READ);
+  FsFile f = sd.open(path, O_RDONLY);
   if (!f) return false;
-  String s = f.readString();
+  Serial.printf("%lu bytes read\n", (unsigned long)f.fileSize());
+  bool ok = f.fileSize() == strlen(SHORT_LINE) && read_expect(f, SHORT_LINE);
   f.close();
-  Serial.printf("%u bytes read\n", (unsigned)s.length());
-  return s == SHORT_LINE;
-}
-
-static void list_root() {
-  File root = SD.open("/");
-  for (File e = root.openNextFile(); e; e = root.openNextFile()) {
-    Serial.printf("  %s%s\n", e.name(), e.isDirectory() ? "/" : "");
-    e.close();
-  }
-  root.close();
+  return ok;
 }
 
 void setup() {
   Serial.begin(115200);
   delay(3000);  // time to open the serial monitor
 
-  if (!SD.begin(SD_CS, sdSpi)) {
-    Serial.println("SD card mount failed");
+  if (!card.begin() || !sd.begin(&card)) {
+    Serial.printf("SD card mount failed (errorCode=%u errorData=0x%02X)\n", card.errorCode(), card.errorData());
     return;
   }
-  Serial.println("Filesystem check");
-  list_root();
+  Serial.printf("Filesystem check (%lu sectors)\n", (unsigned long)card.sectorCount());
+  sd.ls(&Serial, LS_SIZE);
 
   Serial.println("\nMultiple block read/write");
-  SD.remove("rats.txt");
-  File f = SD.open("rats.txt", FILE_WRITE);
+  sd.remove("rats.txt");
+  FsFile f = sd.open("rats.txt", O_WRONLY | O_CREAT | O_TRUNC);
   write_lines(f);
   f.print(SHORT_LINE);
   write_lines(f);
-  Serial.printf("%u bytes written\n", (unsigned)f.size());
+  Serial.printf("%lu bytes written (errorCode=%u)\n", (unsigned long)f.fileSize(), card.errorCode());
   f.close();
   bool large_ok = verify_large("rats.txt");
 
   Serial.println("\nSingle block read/write");
-  SD.remove("rats1.txt");
-  f = SD.open("rats1.txt", FILE_WRITE);
+  sd.remove("rats1.txt");
+  f = sd.open("rats1.txt", O_WRONLY | O_CREAT | O_TRUNC);
   f.print(SHORT_LINE);
-  Serial.printf("%u bytes written\n", (unsigned)f.size());
+  Serial.printf("%lu bytes written (errorCode=%u)\n", (unsigned long)f.fileSize(), card.errorCode());
   f.close();
   bool small_ok = verify_small("rats1.txt");
-
-  SD.end();
 
   Serial.println("\nVerifying data read back");
   Serial.println(large_ok ? "Large file Pass" : "Large file Fail");
