@@ -45,6 +45,8 @@ pio run -e st7789_receiver -t upload
 
 For the first RP2040 upload, hold BOOTSEL while plugging in the USB cable.
 
+The SD card programs (`sd_card_logger`, `sd_card_test`) use a small bit-banged SPI driver, [`lib/BitbangSdCard`](./software/rp2040/lib/BitbangSdCard), together with SdFat. The SD pins (CLK=GP5, CMD=GP18, DAT0=GP19, CS=GP22) don't match the RP2040's hardware SPI pins, and SdFat's own drivers could not write to the card on my board.
+
 In the demo, pressing the joystick runs `uart_sender` on the RP2040, which sends `0`–`4` over UART. `st7789_receiver` on the ESP32 then shows the digit on the display.
 
 ## UART pins
