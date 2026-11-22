@@ -34,8 +34,7 @@ The firmware is in [`software/`](./software). Each chip has its own [PlatformIO]
 | Folder | Chip | Environments |
 |---|---|---|
 | `software/esp32` | ESP32 | `st7789_receiver` (default), `lgfx_user_setting`, `lgfx_moving_circles`, `lgfx_moving_icons`, `uart_link_test` |
-| `software/rp2040` | RP2040 ([Arduino-Pico](https://github.com/earlephilhower/arduino-pico) core) | `uart_sender` (default), `uart_link_test`, `gp8_toggle_test` |
-| `software/rp2040_micropython` | RP2040 | the original MicroPython scripts |
+| `software/rp2040` | RP2040 ([Arduino-Pico](https://github.com/earlephilhower/arduino-pico) core) | `uart_sender` (default), `sd_card_logger`, `sd_card_test`, `uart_link_test`, `gp8_toggle_test` |
 
 Build and upload, for example:
 
